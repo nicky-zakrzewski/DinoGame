@@ -1,0 +1,73 @@
+STAP 1: COMPONENTEN VASTLEGGEN
+==============================
+
+WEBCONTROLLER:
+
+Hardware:
+	-LCD
+	-Knop
+	-Buzzer
+	-ESP32
+	-Router
+	-Notebook
+
+Taken Webcontroller:
+
+	-Koppelen aan wifi
+	-Veranderen van netwerk met reset knop
+	-Wifimanager om consolenaam in te stellen en reset knop drukken voor wifi
+	-Score en consolenaam sturen naar backend
+
+Data Webcontroller:
+	-Totale score van de speler (integer?)
+	-Consolenaam (string)
+
+Richting data uitwisseling:
+	-Score en consolenaam van ESP naar backend
+
+Snelheid data uitwisseling:
+
+	-Snelheid hoeft niet heel hoog te zijn, maar wel asap score zien als game gedaan is
+----------------------------------------------------------------------------------------------
+BACKEND:
+
+Taken van backend:
+	-Data ontvangen van ESP32
+	-Data sturen naar frontend
+	-Verzoeken ontvangen van frontend
+
+Communicatieprotocollen:
+	-HTTP protocol
+	-REST tussen backend en frontend
+	-Websockets/MQTT
+
+Backend opzetten:
+	Als we lokaal de scores willen zien, lokaal. Als we globaal de scores willen zien,
+	cloud (waarschijnlijk lokaal)
+----------------------------------------------------------------------------------------------
+FRONTEND:
+
+Taken frontend:
+	-Scores raadplegen
+	-Scores filteren op consolenaam
+	-Scores van backend verwijderen
+
+Data uitwisseling met backend:
+	-Lijst van alle scores
+	-Gefilterde lijst van scores
+	-Commando om scorelijst leeg te maken
+
+In welke richting wordt data uitgewisseld:
+	-Frontend vraagt info aan backend
+	-Backend stuurt data naar frontend
+	-Reset commando is van frontend naar backend
+
+Snelheid data uitwisseling:
+	Liefst zo snel mogelijk, want het is een UI.
+
+Wat moet er aangestuurd worden via frontend web interface:
+	-Vragen om scores (automatisch of met een knop)
+	-Filteren van scores (textbox/dropdownlist)
+	-Resetten van de scores (knop)
+	-Scores tonen (tabel/lijst)
+	

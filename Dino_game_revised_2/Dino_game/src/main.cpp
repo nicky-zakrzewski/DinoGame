@@ -165,6 +165,8 @@ byte BIRD_PART2[8] = {B00000, B10000, B11000, B11100, B11110, B11111, B00000, B0
 int button = 25;              // Pushbutton pin - for making the Dinosaur jump
 int buzzer = 4;               // Passive Buzzer pin - for sound effects
 
+int button2 = 35;
+
 int gamelevel = 0;
 int gamescore = 0;
 
@@ -209,6 +211,17 @@ void gameover() {
     gamescore = 0;
     gamelevel = 0;
 }
+int buttonstate(){
+  int b = 0;
+  int x = analogRead(35);
+  if (200 < x < 400){
+    b = 1;
+  }
+  else{
+    b = 0;
+  }
+  return b;
+}
 
 
 void setup() {
@@ -237,7 +250,7 @@ void setup() {
 
   initSPIFFS();
 
-  // Set GPIO 2 as an OUTPUT
+  // Set GPIO as an OUTPUT
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);
   
@@ -348,6 +361,12 @@ void setup() {
 }
 
 void loop() {
+  digitalWrite(ledPin, HIGH);
+if (digitalRead(button2) == true) {
+  digitalWrite(ledPin, LOW);
+}
+
+
   if (millis() > dinofeettimer + dinofeetperiod) { //delay for changing dino feet position
     dinofeettimer = millis();
     if (dinofeetposition == 1) {
@@ -422,17 +441,17 @@ void loop() {
   }
   
   // colliding conditions for upper row
-  if (digitalRead(button) == HIGH && (column_object == 1 || column_object == 2 ) && row_object == 0 ) {
+  if (digitalRead(ledPin) == 0 && (column_object == 1 || column_object == 2 ) && row_object == 0 ) {
     gameover();
   }
 
   //colliding conditions for bottom row
-  if (digitalRead(button) == false && (column_object == 1 || column_object == 2 ) && row_object == 1 ) {
+  if (digitalRead(ledPin) == 1 && (column_object == 1 || column_object == 2 ) && row_object == 1 ) {
     gameover(); 
   }
 
   int currentdinostate = dinostate;
-  if (digitalRead(button) == true) {
+  if (digitalRead(ledPin) == 0) {
     if (dinostate == 0) {
       lcd.setCursor(0, 1);  // remove dino from bottom row
       lcd.print("    ");

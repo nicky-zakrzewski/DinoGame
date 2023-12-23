@@ -3,6 +3,8 @@
 #include <ESPAsyncWebServer.h>
 #include <AsyncTCP.h>
 #include "SPIFFS.h"
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
 
 
 // Create AsyncWebServer object on port 80
@@ -29,6 +31,7 @@ const char* passPath = "/pass.txt";
 const char* ipPath = "/ip.txt";
 const char* gatewayPath = "/gateway.txt";
 const char* consolePath = "/console.txt";
+
 
 IPAddress localIP;
 //IPAddress localIP(192, 168, 1, 200); // hardcoded
@@ -119,6 +122,7 @@ bool initWiFi() {
     }
   }
 
+  WiFi.config(WiFi.localIP(), WiFi.gatewayIP(), WiFi.subnetMask(), IPAddress(8,8,8,8));
   Serial.println(WiFi.localIP());
   return true;
 }
@@ -193,6 +197,39 @@ int objectspeedperiod = objectspeeddelay;
 unsigned long gamescoretimer = 0;     // gamescore delay
 int gamescoreperiod = 200;
 
+void postGameData(String console, int totalScore) {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    Serial.println(WiFi.dnsIP());
+    http.begin("http://dinogame.eastus.cloudapp.azure.com:3000/post");
+    //http.begin("http://localhost:3000/post");
+    // JSON-object maken en vullen
+    StaticJsonDocument<200> jsonDoc;
+    jsonDoc["Console"] = console;
+    jsonDoc["Score"] = totalScore;
+
+    // JSON-tekst omzetten
+    String jsonString;
+    serializeJson(jsonDoc, jsonString);
+
+    // HTTP POST-verzoek verzenden
+    http.addHeader("Content-Type", "application/json");
+    int httpResponseCode = http.POST(jsonString);
+    Serial.println(jsonString);
+    if (httpResponseCode > 0) {
+      Serial.print("HTTP Response code: ");
+      Serial.println(httpResponseCode);
+      String response = http.getString();
+      Serial.println(response);
+    } else {
+      Serial.print("Error code: ");
+      Serial.println(httpResponseCode);
+    }
+
+    http.end();
+  }
+}
+
 void gameover() {
     lcd.clear();
     lcd.setCursor(4, 0);
@@ -208,6 +245,10 @@ void gameover() {
     lcd.clear();
     column_object = 13;
     objectspeedperiod = objectspeeddelay;
+    int totalScore = gamelevel * 100 + gamescore;
+
+    postGameData(console, totalScore);
+
     gamescore = 0;
     gamelevel = 0;
 }
